@@ -24,16 +24,20 @@ type Tree[E Prioirty] struct {
 //
 // NewTree initializes a heap for the children.
 func NewTree[E Prioirty](e E, children ...*Tree[E]) *Tree[E] {
-	n := &Tree[E]{elem: e, children: make(minHeap[E], 0, len(children))}
+	n := &Tree[E]{elem: e}
+	if len(children) == 0 {
+		return n
+	}
+	n.children = make(minHeap[E], 0, len(children))
 	for _, e := range children {
-		n.link(e)
+		e.link(n)
 		n.children = append(n.children, e)
 	}
 	heap.Init((*minHeap[E])(&n.children))
 	return n
 }
 
-func (parent *Tree[E]) link(n *Tree[E]) {
+func (n *Tree[E]) link(parent *Tree[E]) {
 	n.parent = parent
 	n.heapIndex = parent.children.Len()
 }
@@ -56,7 +60,7 @@ func (parent *Tree[E]) NewChild(e E) *Tree[E] {
 //
 // NewChild places the child on the heap.
 func (parent *Tree[E]) NewChildTree(n *Tree[E]) {
-	parent.link(n)
+	n.link(parent)
 	heap.Push(&parent.children, n)
 }
 
@@ -66,6 +70,14 @@ func (n *Tree[E]) Len() int {
 		return 0
 	}
 	return n.children.Len()
+}
+
+// Parent returns the parent for this node or nil.
+func (n *Tree[E]) Parent() *Tree[E] {
+	if n == nil {
+		return nil
+	}
+	return n.parent
 }
 
 // Elem returns the Prioirty element data for this node if any or false.

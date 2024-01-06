@@ -10,6 +10,14 @@ type p float64
 
 func (p p) Prioirty() float64 { return float64(p) }
 
+func TestNewTreeNoChildren(t *testing.T) {
+	got := NewTree(p(0))
+	want := &Tree[p]{elem: p(0)}
+	if diff := cmp.Diff(want, got, cmp.AllowUnexported(Tree[p]{})); diff != "" {
+		t.Errorf("TestNewTreeNoChildren(): got diff:\n%s", diff)
+	}
+}
+
 func TestNewTree(t *testing.T) {
 	got := NewTree(p(0), NewTree(p(6), NewTree(p(7))), NewTree(p(5)), NewTree(p(4)), NewTree(p(3)), NewTree(p(2)), NewTree(p(1)))
 	want := &Tree[p]{
@@ -30,6 +38,15 @@ func TestNewTree(t *testing.T) {
 	}
 	if diff := cmp.Diff(want, got, cmp.AllowUnexported(Tree[p]{})); diff != "" {
 		t.Errorf("TestNewTree(): got diff:\n%s", diff)
+	}
+}
+
+func TestNewChildNoChildren(t *testing.T) {
+	n := NewTree(p(0))
+	gotChild := n.NewChild(p(1))
+	wantChild := &Tree[p]{parent: n, elem: p(1)}
+	if diff := cmp.Diff(*wantChild, *gotChild, cmp.AllowUnexported(Tree[p]{})); diff != "" {
+		t.Errorf("TestNewChildNoChildren(): got child diff:\n%s", diff)
 	}
 }
 
@@ -64,7 +81,7 @@ func TestLenNil(t *testing.T) {
 	var n *Tree[p]
 	got := n.Len()
 	if want := 0; want != got {
-		t.Errorf("TestLen(): got Len %d, want %d", got, want)
+		t.Errorf("TestLenNil(): got Len %d, want %d", got, want)
 	}
 }
 
@@ -76,14 +93,30 @@ func TestLen(t *testing.T) {
 	}
 }
 
+func TestParentNil(t *testing.T) {
+	var n *Tree[p]
+	got := n.Parent()
+	if want := (*Tree[p])(nil); want != got {
+		t.Errorf("TestParentNil(): got Len %v, want %v", got, want)
+	}
+}
+
+func TestParent(t *testing.T) {
+	n := NewTree[p](p(0), NewTree(p(1)), NewTree(p(2)), NewTree(p(3)))
+	got := n.children[0].Parent()
+	if want := n; want != got {
+		t.Errorf("TestParent(): got Len %v, want %v", got, want)
+	}
+}
+
 func TestElemNil(t *testing.T) {
 	var n *Tree[p]
 	got, gotOk := n.Elem()
 	if diff := cmp.Diff(p(0), got); diff != "" {
-		t.Errorf("TestMinNil(): got diff:\n%s", diff)
+		t.Errorf("TestElemNil(): got diff:\n%s", diff)
 	}
 	if wantOk := false; wantOk != gotOk {
-		t.Errorf("TestMinNil(): got ok %v, want %v", gotOk, wantOk)
+		t.Errorf("TestElemNil(): got ok %v, want %v", gotOk, wantOk)
 	}
 }
 
@@ -91,10 +124,10 @@ func TestElem(t *testing.T) {
 	n := NewTree(p(0))
 	got, gotOk := n.Elem()
 	if diff := cmp.Diff(p(0), got); diff != "" {
-		t.Errorf("TestMinNil(): got diff:\n%s", diff)
+		t.Errorf("TestElem(): got diff:\n%s", diff)
 	}
 	if wantOk := true; wantOk != gotOk {
-		t.Errorf("TestMinNil(): got ok %v, want %v", gotOk, wantOk)
+		t.Errorf("TestElem(): got ok %v, want %v", gotOk, wantOk)
 	}
 }
 
@@ -102,7 +135,7 @@ func TestMinNil(t *testing.T) {
 	var n *Tree[p]
 	got := n.Min()
 	want := (*Tree[p])(nil)
-	if diff := cmp.Diff(want, got); diff != "" {
+	if diff := cmp.Diff(want, got, cmp.AllowUnexported(Tree[p]{})); diff != "" {
 		t.Errorf("TestMinNil(): got diff:\n%s", diff)
 	}
 }
@@ -111,13 +144,22 @@ func TestMinEmpty(t *testing.T) {
 	n := NewTree(p(0))
 	got := n.Min()
 	want := (*Tree[p])(nil)
-	if diff := cmp.Diff(want, got); diff != "" {
+	if diff := cmp.Diff(want, got, cmp.AllowUnexported(Tree[p]{})); diff != "" {
 		t.Errorf("TestMinEmpty(): got diff:\n%s", diff)
 	}
 }
 
 func TestMin(t *testing.T) {
-
+	n := NewTree(p(0), NewTree(p(-1)), NewTree(p(-2)), NewTree(p(-1)))
+	got := n.Min()
+	want := &Tree[p]{
+		parent:    n,
+		heapIndex: 0,
+		elem:      p(-2),
+	}
+	if diff := cmp.Diff(*want, *got, cmp.AllowUnexported(Tree[p]{})); diff != "" {
+		t.Errorf("TestMin(): got diff:\n%s", diff)
+	}
 }
 
 func TestReplaceElem(t *testing.T) {
