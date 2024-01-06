@@ -68,8 +68,13 @@ func (n *Tree[E]) Len() int {
 	return n.children.Len()
 }
 
-// Elem returns the Prioirty element data for this node.
-func (n *Tree[E]) Elem() E { return n.elem }
+// Elem returns the Prioirty element data for this node if any or false.
+func (n *Tree[E]) Elem() (e E, ok bool) {
+	if n == nil {
+		return e, false
+	}
+	return n.elem, true
+}
 
 // Min returns the minimum element or false if none.
 func (n *Tree[E]) Min() *Tree[E] {

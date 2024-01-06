@@ -76,11 +76,25 @@ func TestLen(t *testing.T) {
 	}
 }
 
-func TestElem(t *testing.T) {
-	n := NewTree(p(0))
-	got := n.Elem()
+func TestElemNil(t *testing.T) {
+	var n *Tree[p]
+	got, gotOk := n.Elem()
 	if diff := cmp.Diff(p(0), got); diff != "" {
 		t.Errorf("TestMinNil(): got diff:\n%s", diff)
+	}
+	if wantOk := false; wantOk != gotOk {
+		t.Errorf("TestMinNil(): got ok %v, want %v", gotOk, wantOk)
+	}
+}
+
+func TestElem(t *testing.T) {
+	n := NewTree(p(0))
+	got, gotOk := n.Elem()
+	if diff := cmp.Diff(p(0), got); diff != "" {
+		t.Errorf("TestMinNil(): got diff:\n%s", diff)
+	}
+	if wantOk := true; wantOk != gotOk {
+		t.Errorf("TestMinNil(): got ok %v, want %v", gotOk, wantOk)
 	}
 }
 
