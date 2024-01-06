@@ -60,6 +60,14 @@ func (parent *Tree[E]) NewChildTree(n *Tree[E]) {
 	heap.Push(&parent.children, n)
 }
 
+// Len returns the number of children for this node.
+func (n *Tree[E]) Len() int {
+	if n == nil {
+		return 0
+	}
+	return n.children.Len()
+}
+
 // Elem returns the Prioirty element data for this node.
 func (n *Tree[E]) Elem() E { return n.elem }
 

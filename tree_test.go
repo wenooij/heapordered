@@ -60,6 +60,22 @@ func TestNewChild(t *testing.T) {
 	}
 }
 
+func TestLenNil(t *testing.T) {
+	var n *Tree[p]
+	got := n.Len()
+	if want := 0; want != got {
+		t.Errorf("TestLen(): got Len %d, want %d", got, want)
+	}
+}
+
+func TestLen(t *testing.T) {
+	n := NewTree[p](p(0), NewTree(p(1)), NewTree(p(2)), NewTree(p(3)))
+	got := n.Len()
+	if want := 3; want != got {
+		t.Errorf("TestLen(): got Len %d, want %d", got, want)
+	}
+}
+
 func TestElem(t *testing.T) {
 	n := NewTree(p(0))
 	got := n.Elem()
