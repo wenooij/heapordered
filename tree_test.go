@@ -110,24 +110,20 @@ func TestParent(t *testing.T) {
 }
 
 func TestElemNil(t *testing.T) {
+	defer func() {
+		if err := recover(); err == nil {
+			t.Errorf("TestElemNil(): expected panic")
+		}
+	}()
 	var n *Tree[p]
-	got, gotOk := n.Elem()
-	if diff := cmp.Diff(p(0), got); diff != "" {
-		t.Errorf("TestElemNil(): got diff:\n%s", diff)
-	}
-	if wantOk := false; wantOk != gotOk {
-		t.Errorf("TestElemNil(): got ok %v, want %v", gotOk, wantOk)
-	}
+	n.Elem()
 }
 
 func TestElem(t *testing.T) {
 	n := NewTree(p(0))
-	got, gotOk := n.Elem()
+	got := n.Elem()
 	if diff := cmp.Diff(p(0), got); diff != "" {
 		t.Errorf("TestElem(): got diff:\n%s", diff)
-	}
-	if wantOk := true; wantOk != gotOk {
-		t.Errorf("TestElem(): got ok %v, want %v", gotOk, wantOk)
 	}
 }
 

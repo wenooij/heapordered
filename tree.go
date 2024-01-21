@@ -80,15 +80,13 @@ func (n *Tree[E]) Parent() *Tree[E] {
 	return n.parent
 }
 
-// Elem returns the Prioirty element data for this node if any or false.
-func (n *Tree[E]) Elem() (e E, ok bool) {
-	if n == nil {
-		return e, false
-	}
-	return n.elem, true
-}
+// Elem returns the Prioirty element data for this node.
+//
+// Fix or ReplaceElem should be called when the Prioirty value changes through e.
+// Elem panics if the node is nil.
+func (n *Tree[E]) Elem() (e E) { return n.elem }
 
-// Min returns the minimum element or false if none.
+// Min returns the minimum element or nil if none is available.
 func (n *Tree[E]) Min() *Tree[E] {
 	if n == nil || n.children.Len() == 0 {
 		return nil
@@ -107,8 +105,7 @@ func (n *Tree[E]) ReplaceElem(e E) (old E) {
 
 // Fix repairs the heap property for the current node in the parent's child heap.
 //
-// Fix should be called when the node's Prioirty value changes.
-// Prefer ReplaceElem when possible.
+// Fix or ReplaceElem should be called when the node's Prioirty value changes.
 func (n *Tree[E]) Fix() {
 	if n.parent != nil {
 		heap.Fix(&n.parent.children, n.heapIndex)
