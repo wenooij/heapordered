@@ -33,7 +33,7 @@ func NewTree[E Prioirty](e E, children ...*Tree[E]) *Tree[E] {
 		e.link(n)
 		n.children = append(n.children, e)
 	}
-	heap.Init((*minHeap[E])(&n.children))
+	n.Init()
 	return n
 }
 
@@ -46,6 +46,9 @@ func (n *Tree[E]) unlink() {
 	n.parent = nil
 	n.heapIndex = 0
 }
+
+// Init fixes the child heap for this node.
+func (n *Tree[E]) Init() { heap.Init(&n.children) }
 
 // NewChild creates a new child node in the parent.
 //
