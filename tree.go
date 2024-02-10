@@ -4,16 +4,16 @@ package heapordered
 import "container/heap"
 
 // Priority is an interface for min-heap priority.
-type Prioirty interface {
+type Priority interface {
 	// Prioirty returns the value used for min-heap priority.
-	Prioirty() float64
+	Priority() float64
 }
 
 // Tree represents a node in the tree among heap-ordered children.
 //
 // Tree keeps track of its own index in the child slice so we can
 // call Fix when the Priority changes.
-type Tree[E Prioirty] struct {
+type Tree[E Priority] struct {
 	parent    *Tree[E]
 	children  minHeap[E]
 	heapIndex int // Index in the parent heap.
@@ -23,7 +23,7 @@ type Tree[E Prioirty] struct {
 // NewTree creates a new tree node with children.
 //
 // NewTree initializes a heap for the children.
-func NewTree[E Prioirty](e E, children ...*Tree[E]) *Tree[E] {
+func NewTree[E Priority](e E, children ...*Tree[E]) *Tree[E] {
 	n := &Tree[E]{elem: e}
 	if len(children) == 0 {
 		return n

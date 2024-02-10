@@ -8,7 +8,7 @@ import (
 
 type p float64
 
-func (p p) Prioirty() float64 { return float64(p) }
+func (p p) Priority() float64 { return float64(p) }
 
 func TestNewTreeNoChildren(t *testing.T) {
 	got := NewTree(p(0))
