@@ -6,32 +6,27 @@ import (
 	"slices"
 )
 
-// Priority is an interface for min-heap priority.
-type Priority interface {
-	// Prioirty returns the value used for min-heap priority.
-	Priority() float64
-}
-
 // Tree represents a node in the tree among heap-ordered children.
 //
 // Tree keeps track of its own index in the child slice so we can
 // call Fix when the Priority changes.
-type Tree[E Priority] struct {
+type Tree[E any] struct {
 	parent    *Tree[E]
 	children  minHeap[E]
 	heapIndex int // Index in the parent heap.
-
-	// E is the priority element payload.
+	// Priority value for the node.
 	//
 	// Fix or ReplaceElem should be called when the Prioirty value changes.
+	Priority float64
+	// E is a generic element payload.
 	E E
 }
 
 // NewTree creates a new tree node with children.
 //
 // NewTree initializes a heap for the children.
-func NewTree[E Priority](e E, children ...*Tree[E]) *Tree[E] {
-	n := &Tree[E]{E: e}
+func NewTree[E any](e E, priority float64, children ...*Tree[E]) *Tree[E] {
+	n := &Tree[E]{E: e, Priority: priority}
 	if len(children) == 0 {
 		return n
 	}
@@ -60,8 +55,8 @@ func (n *Tree[E]) Init() { heap.Init(&n.children) }
 // NewChild creates a new child node in the parent.
 //
 // NewChild places the child on the heap.
-func (parent *Tree[E]) NewChild(e E) *Tree[E] {
-	n := &Tree[E]{E: e}
+func (parent *Tree[E]) NewChild(e E, priority float64) *Tree[E] {
+	n := &Tree[E]{E: e, Priority: priority}
 	parent.NewChildTree(n)
 	return n
 }
@@ -101,13 +96,13 @@ func (n *Tree[E]) Min() *Tree[E] {
 	return n.children[0]
 }
 
-// ReplaceElem replaces the element for the current node and calls Fix to repair the heap.
+// UpdatePriority replaces the priority for the current node and calls Fix to repair the heap property.
 // Returns the old element.
-func (n *Tree[E]) ReplaceElem(e E) (old E) {
-	old = n.E
-	n.E = e
+func (n *Tree[E]) UpdatePriority(v float64) (oldValue float64) {
+	oldValue = n.Priority
+	n.Priority = v
 	n.Fix()
-	return old
+	return oldValue
 }
 
 // Fix repairs the heap property for the current node in the parent's child heap.
