@@ -1,7 +1,10 @@
 // Package heapordered provides Tree: a generic min-heap-ordered tree.
 package heapordered
 
-import "container/heap"
+import (
+	"container/heap"
+	"slices"
+)
 
 // Priority is an interface for min-heap priority.
 type Priority interface {
@@ -17,14 +20,18 @@ type Tree[E Priority] struct {
 	parent    *Tree[E]
 	children  minHeap[E]
 	heapIndex int // Index in the parent heap.
-	elem      E   // Payload.
+
+	// E is the priority element payload.
+	//
+	// Fix or ReplaceElem should be called when the Prioirty value changes.
+	E E
 }
 
 // NewTree creates a new tree node with children.
 //
 // NewTree initializes a heap for the children.
 func NewTree[E Priority](e E, children ...*Tree[E]) *Tree[E] {
-	n := &Tree[E]{elem: e}
+	n := &Tree[E]{E: e}
 	if len(children) == 0 {
 		return n
 	}
@@ -54,7 +61,7 @@ func (n *Tree[E]) Init() { heap.Init(&n.children) }
 //
 // NewChild places the child on the heap.
 func (parent *Tree[E]) NewChild(e E) *Tree[E] {
-	n := &Tree[E]{elem: e}
+	n := &Tree[E]{E: e}
 	parent.NewChildTree(n)
 	return n
 }
@@ -66,6 +73,9 @@ func (parent *Tree[E]) NewChildTree(n *Tree[E]) {
 	n.link(parent)
 	heap.Push(&parent.children, n)
 }
+
+// Grow ensures capacity for the given number of additional children.
+func (n *Tree[E]) Grow(cap int) { n.children = slices.Grow(n.children, cap) }
 
 // Len returns the number of children for this node.
 func (n *Tree[E]) Len() int {
@@ -83,12 +93,6 @@ func (n *Tree[E]) Parent() *Tree[E] {
 	return n.parent
 }
 
-// Elem returns the Prioirty element data for this node.
-//
-// Fix or ReplaceElem should be called when the Prioirty value changes through e.
-// Elem panics if the node is nil.
-func (n *Tree[E]) Elem() (e E) { return n.elem }
-
 // Min returns the minimum element or nil if none is available.
 func (n *Tree[E]) Min() *Tree[E] {
 	if n == nil || n.children.Len() == 0 {
@@ -100,8 +104,8 @@ func (n *Tree[E]) Min() *Tree[E] {
 // ReplaceElem replaces the element for the current node and calls Fix to repair the heap.
 // Returns the old element.
 func (n *Tree[E]) ReplaceElem(e E) (old E) {
-	old = n.elem
-	n.elem = e
+	old = n.E
+	n.E = e
 	n.Fix()
 	return old
 }
