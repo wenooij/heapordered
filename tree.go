@@ -132,3 +132,8 @@ func (n *Tree[E]) Pop() (min *Tree[E]) {
 	child.unlink()
 	return child
 }
+
+// Children returns the children of the current node.
+//
+// Note that modifying the list require corresponding calls to Fix and Init.
+func (n *Tree[E]) Children() []*Tree[E] { return n.children }
