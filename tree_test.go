@@ -92,11 +92,12 @@ func TestLen(t *testing.T) {
 }
 
 func TestParentNil(t *testing.T) {
-	var n *Tree[int]
-	got := n.Parent()
-	if want := (*Tree[int])(nil); want != got {
-		t.Errorf("TestParentNil(): got Len %v, want %v", got, want)
-	}
+	defer func() {
+		if recover() == nil {
+			t.Errorf("TestParentNil(): expected panic, got no panic")
+		}
+	}()
+	_ = (*Tree[int])(nil).Parent()
 }
 
 func TestParent(t *testing.T) {
@@ -108,12 +109,12 @@ func TestParent(t *testing.T) {
 }
 
 func TestMinNil(t *testing.T) {
-	var n *Tree[int]
-	got := n.Min()
-	want := (*Tree[int])(nil)
-	if diff := cmp.Diff(want, got, cmp.AllowUnexported(Tree[int]{})); diff != "" {
-		t.Errorf("TestMinNil(): got diff:\n%s", diff)
-	}
+	defer func() {
+		if recover() == nil {
+			t.Errorf("TestMinNil(): expected panic, got no panic")
+		}
+	}()
+	_ = (*Tree[int])(nil).Min()
 }
 
 func TestMinEmpty(t *testing.T) {
@@ -168,12 +169,12 @@ func TestUpdatePriority(t *testing.T) {
 }
 
 func TestRemoveNoParent(t *testing.T) {
-	got := NewTree(0, 0)
-	got.Remove()
-	want := &Tree[int]{parent: nil, heapIndex: 0, E: 0, Priority: 0}
-	if diff := cmp.Diff(want, got, cmp.AllowUnexported(Tree[int]{})); diff != "" {
-		t.Errorf("TestRemoveNoParent(): got diff:\n%s", diff)
-	}
+	defer func() {
+		if recover() == nil {
+			t.Errorf("TestRemoveNoParent(): Expected panic, got no panic")
+		}
+	}()
+	NewTree(0, 0).Remove()
 }
 
 func TestRemove(t *testing.T) {
@@ -210,12 +211,12 @@ func TestRemove(t *testing.T) {
 }
 
 func TestPopEmpty(t *testing.T) {
-	n := NewTree(0, 0)
-	want := (*Tree[int])(nil)
-	got := n.Pop()
-	if diff := cmp.Diff(want, got, cmp.AllowUnexported(Tree[int]{})); diff != "" {
-		t.Errorf("TestPopEmpty(): got diff:\n%s", diff)
-	}
+	defer func() {
+		if recover() == nil {
+			t.Errorf("TestPopEmpty(): expected panic, got no panic")
+		}
+	}()
+	_ = NewTree(0, 0).Pop()
 }
 
 func TestPop(t *testing.T) {
